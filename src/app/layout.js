@@ -1,5 +1,20 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Josefin_Sans, Lato } from "next/font/google";
 import "./globals.css";
+import ReduxProvider from "@/redux/provider";
+import { AuthInitializer } from "@/redux/AuthInitializer";
+import AuthGuard from "@/hooks/authGuard";
+
+const lato = Lato({
+  subsets: ["latin"],
+  weight: ["100", "300", "400", "700", "900"], // choose what you need
+  variable: "--font-lato", // makes it usable in Tailwind
+});
+
+const josefin = Josefin_Sans({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700"], // optional
+  variable: "--font-josefin", // makes it usable in Tailwind
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,9 +35,14 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${josefin.variable} ${geistMono.variable} ${lato.variable} antialiased`}
       >
-        {children}
+        <ReduxProvider>
+          <AuthInitializer />
+          <AuthGuard>
+            {children}
+          </AuthGuard>
+        </ReduxProvider>
       </body>
     </html>
   );
