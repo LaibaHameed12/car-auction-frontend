@@ -3,25 +3,30 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { isAuthenticated } from "@/redux/slices/auth/authSlice";
+import { isAuthenticated, isHydrated } from "@/redux/slices/auth/authSlice";
 
 const AuthGuard = ({ children }) => {
     const router = useRouter();
     const isLoggedIn = useSelector(isAuthenticated);
-
-    // Define route categories
-    const publicRoutes = ["/login", "/register"];
-    const protectedRoutes = ["/profile"]; 
+    const hydrated = useSelector(isHydrated);
 
     useEffect(() => {
+        if (!hydrated) return; // don’t run until restoreSession finished
+
         const path = window.location.pathname;
+        const publicRoutes = ["/login", "/register"];
+        const protectedRoutes = ["/profile"];
 
         if (isLoggedIn && publicRoutes.includes(path)) {
-            router.replace("/"); 
+            router.replace("/");
         } else if (!isLoggedIn && protectedRoutes.includes(path)) {
-            router.replace("/login"); 
+            router.replace("/login");
         }
-    }, [isLoggedIn, router]);
+    }, [isLoggedIn, hydrated, router]);
+
+    if (!hydrated) {
+        return <div>Loading...</div>; // or a spinner, optional
+    }
 
     return children;
 };

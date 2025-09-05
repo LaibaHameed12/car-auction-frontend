@@ -1,9 +1,9 @@
-// src/redux/slices/auth/authSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     user: null,
     token: null,
+    hydrated: false, // tells us if localStorage restore is done
 };
 
 const slice = createSlice({
@@ -11,63 +11,48 @@ const slice = createSlice({
     initialState,
     reducers: {
         setCredentials: (state, action) => {
-            const { user, token, remember } = action.payload;
+            const { user, token } = action.payload;
             state.user = user;
             state.token = token;
+            state.hydrated = true;
 
             if (typeof window !== "undefined") {
-                // clear both storages first
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-                sessionStorage.removeItem("token");
-                sessionStorage.removeItem("user");
-
-                if (remember) {
-                    localStorage.setItem("token", token);
-                    localStorage.setItem("user", JSON.stringify(user));
-                } else {
-                    sessionStorage.setItem("token", token);
-                    sessionStorage.setItem("user", JSON.stringify(user));
-                }
+                localStorage.setItem("token", token);
+                localStorage.setItem("user", JSON.stringify(user));
             }
         },
 
         logout: (state) => {
             state.user = null;
             state.token = null;
+            state.hydrated = true;
 
             if (typeof window !== "undefined") {
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
-                sessionStorage.removeItem("token");
-                sessionStorage.removeItem("user");
             }
         },
 
         setUser: (state, action) => {
             state.user = action.payload;
+            state.hydrated = true;
+
             if (typeof window !== "undefined") {
-                if (localStorage.getItem("token")) {
-                    localStorage.setItem("user", JSON.stringify(action.payload));
-                } else if (sessionStorage.getItem("token")) {
-                    sessionStorage.setItem("user", JSON.stringify(action.payload));
-                }
+                localStorage.setItem("user", JSON.stringify(action.payload));
             }
         },
 
         restoreSession: (state) => {
             if (typeof window !== "undefined") {
-                const token =
-                    localStorage.getItem("token") || sessionStorage.getItem("token");
-                const user =
-                    JSON.parse(localStorage.getItem("user")) ||
-                    JSON.parse(sessionStorage.getItem("user"));
+                const token = localStorage.getItem("token");
+                const user = localStorage.getItem("user");
 
-                if (token) {
+                if (token && user) {
                     state.token = token;
-                    state.user = user;
+                    state.user = JSON.parse(user);
                 }
             }
+            state.hydrated = true;
         },
     },
 });
@@ -78,15 +63,5 @@ export const actions = slice.actions;
 // selectors
 export const getUser = (state) => state.auth.user;
 export const getToken = (state) => state.auth.token;
-export const isAuthenticated = (state) => {
-    if (state.auth.token) return true;
-
-    if (typeof window !== "undefined") {
-        return !!(
-            localStorage.getItem("token") || sessionStorage.getItem("token")
-        );
-    }
-
-    return false;
-};
-
+export const isAuthenticated = (state) => !!state.auth.token;
+export const isHydrated = (state) => state.auth.hydrated;

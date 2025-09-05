@@ -4,12 +4,15 @@ export const registerSchema = z.object({
   fullName: z.string().min(2, "Full Name is required"),
   email: z.string().email("Enter a valid email"),
 
-  // Only check digits now (since code is separate)
+  idNo: z.string().min(6, "ID number should be at least 6 characters"),
+  idType: z.enum(["passport", "cnic", "driver_license"], {
+    errorMap: () => ({ message: "Please select a valid ID type" }),
+  }),
+
   mobileNo: z.string().regex(
     /^[0-9]{6,14}$/,
     "Enter a valid phone number"
   ),
-
   country: z.string().nonempty("Country code is required"),
 
   username: z.string().min(4, "Username must be at least 4 characters"),
@@ -22,3 +25,4 @@ export const registerSchema = z.object({
   message: "Passwords do not match",
   path: ["confirmPassword"],
 })
+

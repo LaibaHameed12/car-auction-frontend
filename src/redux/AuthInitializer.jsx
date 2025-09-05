@@ -1,4 +1,3 @@
-// src/redux/AuthInitializer.jsx
 "use client";
 
 import { useEffect } from "react";

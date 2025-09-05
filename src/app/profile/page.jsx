@@ -8,16 +8,21 @@ import MyCars from '@/components/Profile/MyCars'
 import PersonalInformation from '@/components/Profile/PersonalInformation'
 import ProfileSidebar from '@/components/Profile/ProfileSidebar'
 import Wishlist from '@/components/Profile/Wishlist'
+import { getUser } from '@/redux/slices/auth/authSlice'
 import { useGetUserQuery } from '@/redux/slices/users/usersApi'
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('personal-info')
 
-  // 🔹 Replace this with the actual logged-in user ID (from auth slice or context)
-  const userId = "68b2be281dad7efd8b06389b"
+  // ✅ Get user object from Redux store
+  const currUser = useSelector(getUser)
+  const userId = currUser?._id   
 
-  const { data: user, error, isLoading } = useGetUserQuery(userId)
+  const { data : user, error, isLoading } = useGetUserQuery(userId, {
+    skip: !userId, 
+  })
 
   const renderTabContent = () => {
     if (isLoading) return <p>Loading...</p>

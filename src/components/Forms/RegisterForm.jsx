@@ -27,6 +27,8 @@ export default function RegisterForm() {
             mobileNo: "",
             username: "",
             password: "",
+            idNo: "",
+            idType: "",
             confirmPassword: "",
             captcha: false,
             terms: false,
@@ -41,7 +43,7 @@ export default function RegisterForm() {
 
             const payload = {
                 ...rest,
-                mobileNo: `+${country}${mobileNo}`,  // ✅ always E.164 format
+                mobileNo: `+${country}${mobileNo}`,  
             }
 
             await signup(payload).unwrap()
@@ -212,6 +214,46 @@ export default function RegisterForm() {
                                     />
                                 </div>
                             </div>
+
+                            <div className="grid grid-cols-2 gap-4 mt-4">
+                                <FormField
+                                    control={form.control}
+                                    name="idType"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>ID Type*</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select ID Type" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="cnic">CNIC</SelectItem>
+                                                    <SelectItem value="passport">Passport</SelectItem>
+                                                    <SelectItem value="driver_license">Driver License</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="idNo"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>ID Number*</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter your ID number" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
 
                             {/* Captcha */}
                             <div>

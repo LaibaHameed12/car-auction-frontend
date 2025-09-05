@@ -1,93 +1,159 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+'use client'
 
-export default function MyCars({myCars}) {
+import { Button } from '@/components/ui/button'
+import { TrendingUp } from 'lucide-react'
+import useTimeLeft from '@/hooks/useTimeLeft'
+
+export default function MyCars({ myCars }) {
+  if (!myCars || myCars.length === 0) {
+    return <p className="text-gray-500">You have no cars listed in auctions.</p>
+  }
+
+  const formatCurrency = (value) =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0,
+    }).format(value)
+
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">My Cars</h2>
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {myCars.map((auction) => {
+          const { months, days, hours, minutes, seconds } = useTimeLeft(
+            auction.endTime
+          )
+          const auctionEnded =
+            months === 0 &&
+            days === 0 &&
+            hours === 0 &&
+            minutes === 0 &&
+            seconds === 0
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {myCars.map((car) => (
-          <Card key={car.id} className="overflow-hidden">
-            <div className="relative">
-              {/* Car Image */}
-              <div className="h-48 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                <span className="text-gray-600 text-4xl">🚗</span>
-              </div>
-              {car.featured && (
-                <Badge className="absolute top-3 left-3 bg-red-500 hover:bg-red-600 text-white">
-                  Featured
-                </Badge>
-              )}
-            </div>
-
-            <CardContent className="p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">{car.title}</h3>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                {/* Winning/Current Bid */}
-                <div>
-                  <span className="text-lg font-bold text-indigo-600">{car.winningBid}</span>
-                  <p className="text-xs text-gray-500">
-                    {car.status === 'sold' ? 'Winning Bid' : 'Current Bid'}
-                  </p>
-                </div>
-
-                {/* Total Bids */}
-                <div className="text-right">
-                  <span className="text-lg font-bold text-gray-800">{car.totalBids}</span>
-                  <p className="text-xs text-gray-500">Total Bids</p>
-                </div>
-              </div>
-
-              {/* Timer or Sold Status */}
-              {car.status === 'sold' ? (
-                <div className="text-center">
-                  <Button disabled className="w-full bg-gray-400 text-white">
-                    Sold
-                  </Button>
-                </div>
-              ) : (
-                <div>
-                  <div className="flex justify-center space-x-2 mb-4">
-                    <div className="text-center">
-                      <div className="bg-gray-800 text-white px-2 py-1 rounded text-xs font-mono">
-                        {car.timeLeft.days}
-                      </div>
-                      <span className="text-xs text-gray-500">Days</span>
-                    </div>
-                    <div className="text-center">
-                      <div className="bg-gray-800 text-white px-2 py-1 rounded text-xs font-mono">
-                        {car.timeLeft.hours}
-                      </div>
-                      <span className="text-xs text-gray-500">Hrs</span>
-                    </div>
-                    <div className="text-center">
-                      <div className="bg-gray-800 text-white px-2 py-1 rounded text-xs font-mono">
-                        {car.timeLeft.minutes}
-                      </div>
-                      <span className="text-xs text-gray-500">Min</span>
-                    </div>
-                    <div className="text-center">
-                      <div className="bg-gray-800 text-white px-2 py-1 rounded text-xs font-mono">
-                        {car.timeLeft.seconds}
-                      </div>
-                      <span className="text-xs text-gray-500">Sec</span>
+          return (
+            <div
+              key={auction._id}
+              className="max-w-md mx-auto bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              {/* Trending Badge */}
+              <div className="relative">
+                {auction.totalBids > 10 && (
+                  <div className="absolute top-4 left-4 z-10">
+                    <div className="bg-red-500 text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-1">
+                      Trending
+                      <TrendingUp className="w-4 h-4" />
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 text-center mb-4">Time Left</p>
-                  
-                  <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
-                    End Bid
-                  </Button>
+                )}
+
+                {/* Car Title */}
+                <div className="text-center pt-8 pb-4">
+                  <h2 className="text-base font-bold text-[#2E3D83]">
+                    {auction.car?.make} {auction.car?.model}
+                  </h2>
+                  <p className="text-gray-500">{auction.car?.year}</p>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+
+                {/* Car Image */}
+                <div className="px-4 pb-6">
+                  <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden">
+                    <img
+                      src={auction.car?.photos[0] || '/assets/placeholder-car.png'}
+                      alt={auction.car?.model || 'Car'}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Bid Information */}
+              <div className="px-6 pb-6">
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  {/* Winning Bid */}
+                  <div className="bg-blue-50 rounded-lg p-4">
+                    <div className="text-sm font-bold text-[#2E3D83]">
+                      {auction.winner
+                        ? formatCurrency(auction.currentBid)
+                        : '—'}
+                    </div>
+                    <div className="text-[#939393] text-xs">Winning Bid</div>
+                  </div>
+
+                  {/* Current Bid */}
+                  <div className="bg-red-50 rounded-lg p-4">
+                    <div className="text-sm font-bold text-[#FF451D]">
+                      {formatCurrency(auction.currentBid)}
+                    </div>
+                    <div className="text-[#939393] text-xs">Current Bid</div>
+                  </div>
+                </div>
+
+                {/* Time and Bids Info */}
+                <div className="flex justify-between items-center mb-6">
+                  {/* Time Left */}
+                  <div className="flex gap-2 mb-2">
+                    {auctionEnded ? (
+                      <div className="text-lg font-medium text-gray-700">
+                        Auction Ended
+                      </div>
+                    ) : (
+                      <>
+                        {months > 0 && (
+                          <div className="text-center">
+                            <div className="bg-gray-100 rounded px-2 py-1 text-[9px] font-medium text-gray-700">
+                              {months}
+                            </div>
+                            <div className="text-[9px] text-gray-500">Months</div>
+                          </div>
+                        )}
+                        <div className="text-center">
+                          <div className="bg-gray-100 rounded px-2 py-1 text-[9px] font-medium text-gray-700">
+                            {days}
+                          </div>
+                          <div className="text-[9px] text-gray-500">Days</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="bg-gray-100 rounded px-2 py-1 text-[9px] font-medium text-gray-700">
+                            {hours}
+                          </div>
+                          <div className="text-[9px] text-gray-500">Hours</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="bg-gray-100 rounded px-2 py-1 text-[9px] font-medium text-gray-700">
+                            {minutes}
+                          </div>
+                          <div className="text-[9px] text-gray-500">Mins</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="bg-gray-100 rounded px-2 py-1 text-[9px] font-medium text-gray-700">
+                            {seconds}
+                          </div>
+                          <div className="text-[9px] text-gray-500">Secs</div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Total Bids */}
+                  <div className="text-right">
+                    <div className="text-xs font-bold text-[#2E3D83]">
+                      {auction.totalBids}
+                    </div>
+                    <div className="text-gray-500 text-[10px]">Total Bids</div>
+                  </div>
+                </div>
+
+                {/* End Bid Button */}
+                <Button
+                  disabled={auctionEnded}
+                  className="w-full bg-[#2E3D83] hover:bg-indigo-700 text-white font-medium py-4 rounded-lg text-base"
+                >
+                  {auctionEnded ? 'Auction Ended' : 'End Bid'}
+                </Button>
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

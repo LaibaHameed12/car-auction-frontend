@@ -173,10 +173,10 @@ export default function PersonalInformation() {
                                                             <SelectValue placeholder="Select Nationality" />
                                                         </SelectTrigger>
                                                         <SelectContent>
+                                                            <SelectItem value="pakistan">Pakistan</SelectItem>
                                                             <SelectItem value="India">India</SelectItem>
                                                             <SelectItem value="USA">USA</SelectItem>
                                                             <SelectItem value="UK">UK</SelectItem>
-                                                            <SelectItem value="Canada">Canada</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 )}
@@ -204,9 +204,9 @@ export default function PersonalInformation() {
                                                             <SelectValue placeholder="Select ID Type" />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value="India">India</SelectItem>
-                                                            <SelectItem value="Passport">Passport</SelectItem>
-                                                            <SelectItem value="Driver License">Driver License</SelectItem>
+                                                            <SelectItem value="cnic">CNIC</SelectItem>
+                                                            <SelectItem value="passport">Passport</SelectItem>
+                                                            <SelectItem value="driver_license">Driver License</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 )}
@@ -218,6 +218,7 @@ export default function PersonalInformation() {
                                             <p className="text-red-500 text-xs">{errors.idType.message}</p>
                                         )}
                                     </div>
+
 
                                     {/* ID Number */}
                                     <div className="space-y-2">
